@@ -1,0 +1,43 @@
+.body 
+{
+	margin: 0px; 
+	padding: 0px;
+	padding-top: 0px;	
+	background-color: #dedbde; 
+}
+.editorHead
+{
+	position:relative;
+	width:100%;
+	height:25px;
+	font:11px Verdana,Arial; 
+	padding-top: 7px;
+	/*color: #8888FF;*/
+}
+.editorHeadEntry
+{
+	float:left;
+	width:auto;
+	padding-left:30px;
+}
+.editorHeadEntryImportant
+{
+	float:left;
+	width:auto;
+	font:11px Verdana,Arial; 
+	font-weight:bold;
+	color:#FF0000;
+	padding-left:30px;
+}
+.CodeMirror 
+{
+	border-top: 1px solid black; 
+	border-bottom: 1px solid black;
+}
+.CodeMirror-focused .cm-matchhighlight 
+{
+	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFklEQVQI12NgYGBgkKzc8x9CMDAwAAAmhwSbidEoSQAAAABJRU5ErkJggg==);
+	background-position: bottom;
+	background-repeat: repeat-x;
+	background-color: #ffdbde; 
+}

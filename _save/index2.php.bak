@@ -1,0 +1,156 @@
+<?
+	$file = "";
+	if( isset( $_GET['file'] ) )
+	{
+		$file = $_GET['file'];
+	}
+?>
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<title>Menu</title>
+		<link rel="stylesheet" href="addon/display/fullscreen.css">
+		<link rel="stylesheet" href="theme/night.css">
+		<script src="lib/codemirror.js"></script>
+		<link rel="stylesheet" href="lib/codemirror.css">
+		<script src="mode/javascript/javascript.js"></script>
+		<script type="text/javascript">
+			
+			var m_curFile = "<? echo $file; ?>";
+			var m_editor = null;
+			//get file content
+			function requestFileContent() 
+			{
+				var xhr_object = null; 
+				if(window.XMLHttpRequest) // Firefox 
+				{
+					xhr_object = new XMLHttpRequest(); 
+				}
+				else if(window.ActiveXObject) // Internet Explorer 
+				{
+					xhr_object = new ActiveXObject("Microsoft.XMLHTTP"); 
+				}
+				else 
+				{ // XMLHttpRequest non supporté par le navigateur 
+					alert("Votre navigateur ne supporte pas les objets XMLHTTPRequest..."); 
+					return; 
+				} 
+				xhr_object.open("POST", "getFileContent.php", true); 
+				xhr_object.onreadystatechange = function() 
+				{ 
+					if(xhr_object.readyState == 4) 
+					{
+						console.log( "recieved" );
+						var data = JSON.parse( xhr_object.responseText );
+						//alert("received " + data);
+						//document.getElementById("code").innerHTML = data;
+						editor.setValue(data);
+					}
+				} 
+				xhr_object.setRequestHeader("Content-type", "application/x-www-form-urlencoded"); 
+				var data = "file="+encodeURIComponent( m_curFile ); 
+				console.log("sending load request for "+ m_curFile );
+				xhr_object.send(data); 
+			}
+			
+			function init()
+			{
+				if( m_curFile.length > 0 )
+				{
+					//alert( "requesting "+file);
+					requestFileContent();
+				}
+			}
+			
+			function onKeyPress( evt )
+			{
+				if(evt.ctrlKey )
+				{
+					//alert( "-"+evt.key.toLowerCase()+"-" );
+					if( evt.key.toLowerCase() == 's' )
+					{
+						saveFileContent();	
+						return false;
+					}
+				}
+			}
+			
+			function saveFileContent()
+			{
+				var xhr_object = null; 
+				if(window.XMLHttpRequest) // Firefox 
+				{
+					xhr_object = new XMLHttpRequest(); 
+				}
+				else if(window.ActiveXObject) // Internet Explorer 
+				{
+					xhr_object = new ActiveXObject("Microsoft.XMLHTTP"); 
+				}
+				else 
+				{ // XMLHttpRequest non supporté par le navigateur 
+					alert("Votre navigateur ne supporte pas les objets XMLHTTPRequest..."); 
+					return; 
+				} 
+				xhr_object.open("POST", "setFileContent.php", true); 
+				xhr_object.onreadystatechange = function() 
+				{ 
+					if(xhr_object.readyState == 4) 
+					{
+						//alert( xhr_object.responseText );
+						var data = JSON.parse( xhr_object.responseText );
+						alert(data);
+					}
+				} 
+				xhr_object.setRequestHeader("Content-type", "application/x-www-form-urlencoded"); 
+				
+				var doc = m_editor.getDoc();
+				var content = doc.getValue();
+				
+				content = encodeURIComponent( content  );
+				var data = "file="+encodeURIComponent( m_curFile )+"&data="+content; 
+				xhr_object.send(data); 
+
+			}
+			
+		</script>
+	</head>
+	<body>
+		<form>
+			<textarea id="code" name="code">
+			</textarea>
+		</form>
+  	<script>
+			window.onload = init; 		
+			window.onkeypress = onKeyPress
+			m_editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+      						lineNumbers: true,
+							mode: "htmlmixed",
+    					});
+  	</script>
+	</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

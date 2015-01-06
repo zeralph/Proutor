@@ -1,0 +1,398 @@
+<?
+	$file = "";
+	if( isset( $_GET['file'] ) )
+	{
+		$file = $_GET['file'];
+	}	
+	$name = "";
+	if( isset( $_GET['name'] ) )
+	{
+		$name = $_GET['name'];
+	}
+
+?>
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<title>Menu</title>
+		<link rel="stylesheet" href="theme/night.css">
+		<style type="text/css">
+		  .CodeMirror {border-top: 1px solid black; border-bottom: 1px solid black;}
+		  .CodeMirror-focused .cm-matchhighlight {
+			background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFklEQVQI12NgYGBgkKzc8x9CMDAwAAAmhwSbidEoSQAAAABJRU5ErkJggg==);
+			background-position: bottom;
+			background-repeat: repeat-x;
+			background-color: #ffdbde; 
+		  }
+		</style>	
+		<style type="text/css">
+		body 
+		{
+			margin: 0px; 
+			padding: 0px;
+			padding-top: 0px;	
+			background-color: #dedbde; 
+		}
+		.editorHead
+		{
+			position:relative;
+			width:100%;
+			height:25px;
+			font:11px Verdana,Arial; 
+			padding-top: 7px;
+			/*color: #8888FF;*/
+		}
+		.editorHeadEntry
+		{
+			float:left;
+			width:auto;
+			padding-left:30px;
+		}
+		.editorHeadEntryImportant
+		{
+			float:left;
+			width:auto;
+			font:11px Verdana,Arial; 
+			font-weight:bold;
+			color:#FF0000;
+			padding-left:30px;
+		}
+		</style>
+		<script src="lib/codemirror.js"></script>
+		<link rel="stylesheet" href="lib/codemirror.css">
+		<script src="mode/javascript/javascript.js"></script>
+		<script src="mode/xml/xml.js"></script>
+		<script src="mode/htmlmixed/htmlmixed.js"></script>
+		<script src="mode/css/css.js"></script>
+		<script src="mode/php/php.js"></script>
+		<script src="mode/htmlmixed/htmlmixed.js"></script>
+		<script src="mode/meta.js"></script>
+		<script src="addon/edit/matchbrackets.js"></script>
+      	<script src="addon/runmode/colorize.js"></script>
+		<script src="addon/search/search.js"></script>
+		<script src="addon/search/searchcursor.js"></script>
+		<script src="addon/search/match-highlighter.js"></script>
+		<script src="../Parameters/parameters.js"></script>
+		<script type="text/javascript">
+			
+			var m_curFile = "<? echo $file; ?>";
+			var m_curFileName = "<? echo $name; ?>";
+			var m_editor = null;
+			var m_mainPage = null; 
+			var m_curChange = undefined;
+			var m_searchCursor = null;
+			var m_searchStr = "";
+			var m_searchLoop = false;
+			//console.log("editor is opening on "+m_curFile);
+			
+			function search( str, bMatchCase, bFromStart, bLoop )
+			{
+				var curCursor = m_editor.doc.getCursor();
+				m_searchStr = str;
+				m_searchLoop = bLoop;
+				m_searchCursor = m_editor.getSearchCursor( str, curCursor, bMatchCase);
+				nextMatch();
+			}
+			
+			function nextMatch()
+			{
+				if( m_searchCursor != undefined )
+				{
+					var bFound = m_searchCursor.findNext();
+					if( bFound )
+					{
+						m_editor.doc.setSelection( m_searchCursor.pos.from, m_searchCursor.pos.to );
+						return;
+					}
+
+				}
+				alert( m_searchStr +" not found");
+			}
+			
+			function prevMatch()
+			{
+				if( m_searchCursor != undefined )
+				{
+					var bFound = m_searchCursor.findPrev();
+					if( bFound )
+					{
+						m_editor.doc.setSelection( m_searchCursor.pos.from, m_searchCursor.pos.to );
+						return;
+					}
+				}
+				alert( m_searchStr +" not found");
+			}
+			
+			function setMainPage( page )
+			{
+				m_mainPage = this;	
+			}
+			
+			function getEditor()
+			{
+				return m_editor;
+			}
+			
+			//get file content
+			function requestFileContent() 
+			{
+				top.setLoading( true );
+				var xhr_object = null; 
+				if(window.XMLHttpRequest) // Firefox 
+				{
+					xhr_object = new XMLHttpRequest(); 
+				}
+				else if(window.ActiveXObject) // Internet Explorer 
+				{
+					xhr_object = new ActiveXObject("Microsoft.XMLHTTP"); 
+				}
+				else 
+				{ // XMLHttpRequest non supporté par le navigateur 
+					alert("Votre navigateur ne supporte pas les objets XMLHTTPRequest..."); 
+					return; 
+				} 
+				xhr_object.open("POST", "getFileContent.php", true); 
+				xhr_object.onreadystatechange = function() 
+				{ 
+					if(xhr_object.readyState == 4) 
+					{
+						//console.log( "recieved" );
+						//alert( xhr_object.responseText );
+						var data = JSON.parse( xhr_object.responseText );
+						//var ext = data.ext;
+						//alert(ext);
+						//alert( data.error );
+						if( data['error'] == "0" )
+						{
+							try 
+							{
+								m_editor.setValue(data.data);
+								myParameters.addFileToHistory( m_curFile );
+								m_curChange = m_editor.getDoc().changeGeneration( true );
+								//m_editor.highlightSelectionMatches( true );
+								UpdateSaveStatus();
+
+								var div;
+								div = document.getElementById('div_path');
+								div.innerHTML = "<b>Path</b> "+data.path;
+								div = document.getElementById('div_perm');
+								div.innerHTML = "<b>Rights</b> "+data.perm;
+								div = document.getElementById('div_size');
+								div.innerHTML = "<b>Size</b> "+data.size+"o";
+
+							}
+							catch( error)
+							{
+								top.setLoading( false );
+								alert("editor error : "+error);
+								top.removeTab( m_curFileName, false);
+							}	
+						}
+						else
+						{
+							alert(data.error);
+						}
+						//setExtension( data.ext );
+						console.log("guessing mode for " + data.ext );
+						var info = CodeMirror.findModeByExtension(data.ext);
+                      	console.log("info is "+info);
+						if (info) 
+						{
+						  	mode = info.mode;
+                          	console.log("[EDITOR] guessed mode "+mode);
+							m_editor.setOption( "mode", mode );
+						}
+                      	else
+                      	{
+							alert(" guess mode error "+data.ext);
+                        }
+                      	CodeMirror.colorize();
+						top.setLoading( false );
+					}
+				} 
+				xhr_object.setRequestHeader("Content-type", "application/x-www-form-urlencoded"); 
+				var data = "file="+encodeURIComponent( m_curFile ); 
+				//console.log("sending load request for "+ m_curFile );
+				xhr_object.send(data); 
+			}
+			
+			function setExtension( ext )
+			{
+				switch( ext )
+				{
+						case "js":
+						{
+							m_editor.setOption( "mode", "javascript" );
+							return;
+						}
+						case "php":
+						{
+							m_editor.setOption( "mode", "text/html" );
+							return;
+						}
+						case "html":
+						{
+							m_editor.setOption( "mode", "text/html" );
+							return;
+						}	
+				}
+			}
+			
+			function init()
+			{
+				if( m_curFile.length > 0 )
+				{
+					//alert( "requesting "+file);
+					requestFileContent();
+				}
+				top.Tabs.showTab( null, m_curFile);
+			}
+			
+			
+			function saveFileContent()
+			{
+				//console.log( "saving "+ m_curFile );
+				var xhr_object = null; 
+				if(window.XMLHttpRequest) // Firefox 
+				{
+					xhr_object = new XMLHttpRequest(); 
+				}
+				else if(window.ActiveXObject) // Internet Explorer 
+				{
+					xhr_object = new ActiveXObject("Microsoft.XMLHTTP"); 
+				}
+				else 
+				{ // XMLHttpRequest non supporté par le navigateur 
+					alert("Votre navigateur ne supporte pas les objets XMLHTTPRequest..."); 
+					return; 
+				} 
+				xhr_object.open("POST", "setFileContent.php", true); 
+				xhr_object.onreadystatechange = function() 
+				{ 
+					if(xhr_object.readyState == 4) 
+					{
+						//alert( xhr_object.responseText );
+						var data = JSON.parse( xhr_object.responseText );
+						top.m_global_bottomBar.SetText( "Saved "+ m_curFile );
+						m_curChange = m_editor.getDoc().changeGeneration( true );
+						UpdateSaveStatus();
+						//alert(data);
+					}
+				} 
+				//console.log("saving : ");
+				xhr_object.setRequestHeader("Content-type", "application/x-www-form-urlencoded"); 
+				//console.log("editor : "+m_editor);
+				var doc = m_editor.getDoc();
+				//console.log("doc : "+doc);
+				var content = doc.getValue();
+				//console.log(content);
+				content = encodeURIComponent( content  );
+				var data = "file="+encodeURIComponent( m_curFile )+"&data="+content; 
+				
+				xhr_object.send(data); 
+
+			}
+			
+			function onResize()
+			{
+				var height = top.getDocHeight().h;
+				m_editor.setSize("100%", (height-20)+"px");
+			}
+			
+			function close()
+			{
+				top.Tabs.removeEditor( m_curFileName );
+			}
+			
+			function onKeyPress(e)
+			{
+				UpdateSaveStatus();
+				top.onKeyPress(e);
+			}
+			
+			function getIsClean()
+			{
+				return m_editor.doc.isClean( m_curChange );
+			}
+			
+			function UpdateSaveStatus()
+			{
+				var pDiv = document.getElementById("div_save");
+				var bIsClean = m_editor.doc.isClean( m_curChange );
+				console.log("m_curChange is "+m_curChange+", clean is "+bIsClean);
+				if( pDiv != null && !bIsClean )
+				{
+					pDiv.innerHTML = "NOT SAVED";
+				}
+				else
+				{
+					pDiv.innerHTML = "";
+				}
+			}
+			
+		</script>
+	</head>
+	<body>
+		<div id="codeMirrorEditorDiv" class="codeMirrorEditorDiv">
+			<div id="editorHead" class="editorHead">
+				<div class="editorHeadEntry" id="div_path"></div>
+				<div class="editorHeadEntry" id="div_perm"></div>
+				<div class="editorHeadEntry" id="div_size"></div>
+				<div class="editorHeadEntryImportant" id="div_save"></div>
+			</div>
+			<form>
+				<textarea id="code" name="code"></textarea>
+			</form>
+			<script>
+					window.onload = init;
+					window.unload  = close;
+					window.onresize = onResize;
+					document.onkeypress = onKeyPress;
+					document.onkeydown = onKeyPress;
+					//in resize.js
+					document.onmousedown = top.doDown;
+					document.onmouseup   = top.doUp;
+					document.onmousemove = top.doMove;
+					
+					m_editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+									lineNumbers: true,
+									mode: "htmlmixed",
+									matchBrackets: true,
+									highlightSelectionMatches: {showToken: /\w/}
+								});
+					//var o = new Object();
+					//
+					top.Tabs.m_editors[m_curFile] = m_editor;
+					console.log("add "+top.Tabs.m_editors[m_curFile]);
+					top.Tabs.m_currentEditor = top.Tabs.m_editors[m_curFile];
+					onResize();
+			</script>
+		</div>
+	</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
