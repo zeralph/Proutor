@@ -7,6 +7,6 @@
 		<script type="text/javascript" src="javascript/menu.js"></script>
 	</head>
 <body>
-	<? include("menuContent.php"); ?>
+	<?php include("menuContent.php"); ?>
 </body>
 </html>

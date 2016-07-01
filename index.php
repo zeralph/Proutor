@@ -41,7 +41,7 @@
 		</div>
     	<div id="main" class="main">
             <div id="menuDiv" class="menuDiv">
-				<? include("Menu/menuContent.php"); ?>
+				<?php include("Menu/menuContent.php"); ?>
          	</div>
 			<div id="browser" class="browser" onload="loadBrowser">
 			</div>
@@ -53,7 +53,7 @@
 				</div>
 			</div>
             <div id="bottombar" class="bottombar">BOTTOMBAR</div>
-			<div id="search" class="search" ><? include("Search/search.php"); ?></div>
+			<div id="search" class="search" ><?php include("Search/search.php"); ?></div>
         </div>
 	</body>
 </html>

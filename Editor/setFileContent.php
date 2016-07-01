@@ -1,4 +1,4 @@
-<?
+<?php
 	if( !isset( $_POST["data"] ) || !isset( $_POST["file"] ) )
 	{
 		echo json_encode("error: imcomplete data received");

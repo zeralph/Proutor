@@ -1,4 +1,4 @@
-<?
+<?php
 	
 	$paramFile = "/var/www/private/Proutor/Parameters/parameters.cfg";
 	$params = null;
@@ -97,7 +97,7 @@
 	}
 ?>
 
-<?
+<?php
 
 if( isset( $_POST['getParam'] ) )
 {
@@ -135,7 +135,7 @@ else if( isset( $_GET['getParam'] ) )
 
 
 
-<?
+<?php
 	
 /*
 	//test

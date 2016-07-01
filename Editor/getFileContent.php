@@ -1,4 +1,4 @@
-<?
+<?php
 
 	function getFullPerm( $file )
 	{

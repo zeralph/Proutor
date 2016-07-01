@@ -1,4 +1,4 @@
-<? include("../Parameters/parameters.php"); ?>
+<?php include("../Parameters/parameters.php"); ?>
 
 <!DOCTYPE html>
 <html>
@@ -35,7 +35,7 @@
 			document.onmousemove = top.Resize.doMove;
 		</script>
 		<div id="lastFiles">
-			<?
+			<?php
 				$arr = getParameter( 'openedFiles', true );
 				$nbFiles  = getParameter('openedFileIndex');
 

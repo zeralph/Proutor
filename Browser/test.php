@@ -6,7 +6,7 @@
 	</head>
 	<body>
 
-<?
+<?php
 	$path = "/data/1to/_VIDZ_MERDE";
 	$path = str_replace(" ", "\ ", $path);
 	$path = str_replace("(", "\(", $path);

@@ -1,4 +1,4 @@
-<?
+<?php
 	$file = "";
 	if( isset( $_GET['file'] ) )
 	{
@@ -96,9 +96,9 @@
 				
 					function onLoad()
 					{
-						var curFile = "<? echo $file; ?>";
-						var curFileName = "<? echo $name; ?>";
-						var bShow = <? if($show){echo"true";}else{echo"false";} ?>;
+						var curFile = "<?php echo $file; ?>";
+						var curFileName = "<?php echo $name; ?>";
+						var bShow = <?php if($show){echo"true";}else{echo"false";} ?>;
 						var myEditor = new Editor.instance( curFile, curFileName, bShow );
 						myEditor.init();
 						top.Tabs.m_editors[curFile] = myEditor;

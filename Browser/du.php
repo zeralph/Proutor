@@ -6,7 +6,7 @@
 	</head>
 	<body>
 
-<?
+<?php
 	$path = "/home/ralph/";
 	$path = str_replace(" ", "\ ", $path);
 	$path = str_replace("(", "\(", $path);
