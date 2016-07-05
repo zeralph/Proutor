@@ -1,6 +1,6 @@
 var menu=function() 
 {
-	var t=1,z=50,s=6,a;
+	var t=0,z=0,s=01,a;
 	
 	//----------------------------
 	function dd(n)

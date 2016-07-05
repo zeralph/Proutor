@@ -1,147 +1,165 @@
-function Proutor()
+"use strict"
+var Proutor = function()
 {
+	this.m_overlayLoadingRefCount = 0;
+	this.m_showSearch = false;
+	this.m_tabs = null;
+	this.m_browser = null;
+	this.m_parameters = null;
 }
 
-	Proutor.m_overlayLoadingRefCount = 0;
-	Proutor.m_showSearch = false;
 
-	Proutor.SetBottombarText = function( text )
+Proutor.prototype.getTabs = function()
+{
+	return this.m_tabs;
+}
+
+Proutor.prototype.SetBottombarText = function( text )
+{
+	document.getElementById('bottombar').innerHTML = text;
+}
+
+Proutor.prototype.setLoading = function( isLoading )
+{
+	if( isLoading )
 	{
-		document.getElementById('bottombar').innerHTML = text;
+		Proutor.m_overlayLoadingRefCount ++;		
 	}
-
-	Proutor.setLoading = function( isLoading )
+	else
 	{
-		if( isLoading )
-		{
-			Proutor.m_overlayLoadingRefCount ++;		
-		}
-		else
-		{
-			Proutor.m_overlayLoadingRefCount --;
-		}
-		if( Proutor.m_overlayLoadingRefCount < 0 )
-		{	
-			alert("refcount error" );
-			Proutor.m_overlayLoadingRefCount = 0;
-		}
-		if( Proutor.m_overlayLoadingRefCount > 0 )
-		{	
-			document.getElementById("overlay").style.display = "block";
-		}
-		else
-		{
-			document.getElementById("overlay").style.display = "none";
-		}
+		Proutor.m_overlayLoadingRefCount --;
 	}
-
-	Proutor.removeTab = function( name, confirm )
-	{
-		Tabs.removeTab( name, confirm );
+	if( Proutor.m_overlayLoadingRefCount < 0 )
+	{	
+		alert("refcount error" );
+		Proutor.m_overlayLoadingRefCount = 0;
 	}
-
-	Proutor.onKeyPress = function( e )
-	{
-		if ( (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) 
-		{
-			//save
-			if( e.keyCode == 83 )
-			{
-				if( Tabs.m_currentEditor != null )
-				{
-					Tabs.m_currentEditor.saveFileContent();
-				}
-				e.preventDefault();
-				return false;
-			}
-			//search
-			if( e.keyCode == 70 )
-			{
-				Proutor.showSearch( !Proutor.m_showSearch );
-				e.preventDefault();
-				return false;
-			}
-		}
-		if( Tabs.m_currentEditor != null )
-		{
-			Tabs.m_currentEditor.onKeyPress( e );
-		}
-		return true;
+	if( Proutor.m_overlayLoadingRefCount > 0 )
+	{	
+		document.getElementById("overlay").style.display = "block";
 	}
-
-	Proutor.getPageDimensions = function() 
+	else
 	{
-		var winW = 630;
-		var winH = 460;
-		if (document.body && document.body.offsetWidth) 
-		{
-		 winW = document.body.offsetWidth;
-		 winH = document.body.offsetHeight;
-		}
-		if (document.compatMode=='CSS1Compat' &&
-			document.documentElement &&
-			document.documentElement.offsetWidth ) 
-		{
-		 winW = document.documentElement.offsetWidth;
-		 winH = document.documentElement.offsetHeight;
-		}
-		if (window.innerWidth && window.innerHeight) 
-		{
-		 winW = window.innerWidth;
-		 winH = window.innerHeight;
-		}
-		return { w:winW, h:winH };
-	}
-
-	Proutor.showSearch = function( bShow )
-	{
-		Proutor.m_showSearch = bShow;
-		if( bShow )
-		{
-			document.getElementById("search").style.display = "block";
-		}
-		else
-		{
-			document.getElementById("search").style.display = "none";
-		}
-	}
-
-	Proutor.onLoad = function()
-	{
-		Browser.init("browser", "/private/Proutor/Browser/");
-		Tabs.init("editor","/private/Proutor/Tabs/");
-		Proutor.onResize();
 		document.getElementById("overlay").style.display = "none";
-		Proutor.showSearch( false );
 	}
-	
-	Proutor.onResize = function()
-	{
-		var height = Proutor.getPageDimensions().h;
-		document.getElementById('browser').style.height = (height - 50) + "px";
-		document.getElementById('editor').style.height = (height - 50) + "px";
-		document.getElementById('cesure').style.height = (height - 50) + "px";
-		document.getElementById('bottombar').style.top = (height - 50) + "px";
-		document.getElementById('search').style.top = (height - 225) + "px";
-		//Tabs.Resize( height );
-		Tabs.ResizeTabs();
-	}
+}
 
-	Proutor.changeSyntax = function( language )
+Proutor.prototype.removeTab = function( name, confirm )
+{
+	this.m_tabs.removeTab( name, confirm );
+}
+
+Proutor.prototype.onKeyPress = function( e )
+{
+	if ( (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) 
 	{
-		if( Tabs.m_currentEditor !== null )
+		//save
+		if( e.keyCode == 83 )
 		{
-			Tabs.m_currentEditor.setLanguage( language );
+			if( this.m_tabs.m_currentEditor != null )
+			{
+				this.m_tabs.m_currentEditor.saveFileContent();
+			}
+			e.preventDefault();
+			return false;
+		}
+		//search
+		if( e.keyCode == 70 )
+		{
+			Proutor.showSearch( !Proutor.m_showSearch );
+			e.preventDefault();
+			return false;
 		}
 	}
-	
-	Proutor.changeEditorStyle = function(style)
+	if( this.m_tabs.m_currentEditor != null )
 	{
-		Tabs.UpdateStyle( style );
+		this.m_tabs.m_currentEditor.onKeyPress( e );
 	}
+	return true;
+}
 
-	Proutor.onUnload = function()
+Proutor.prototype.getPageDimensions = function() 
+{
+	var winW = 630;
+	var winH = 460;
+	if (document.body && document.body.offsetWidth) 
 	{
+	 winW = document.body.offsetWidth;
+	 winH = document.body.offsetHeight;
 	}
+	if (document.compatMode=='CSS1Compat' &&
+		document.documentElement &&
+		document.documentElement.offsetWidth ) 
+	{
+	 winW = document.documentElement.offsetWidth;
+	 winH = document.documentElement.offsetHeight;
+	}
+	if (window.innerWidth && window.innerHeight) 
+	{
+	 winW = window.innerWidth;
+	 winH = window.innerHeight;
+	}
+	return { w:winW, h:winH };
+}
+
+Proutor.prototype.showSearch = function( bShow )
+{
+	Proutor.m_showSearch = bShow;
+	if( bShow )
+	{
+		document.getElementById("search").style.display = "block";
+	}
+	else
+	{
+		document.getElementById("search").style.display = "none";
+	}
+}
+
+Proutor.prototype.GetParameters = function()
+{
+	return this.m_parameters;
+}
+
+Proutor.prototype.onLoad = function()
+{
+	this.m_browser = new Browser( this );
+	this.m_parameters = new Parameters();
+	this.m_tabs = new TabList( this );
+	
+	this.m_browser.init("browser", "/private/Proutor/Browser/");
+	this.m_tabs.init("editor","/private/Proutor/Tabs/");
+	this.onResize();
+	document.getElementById("overlay").style.display = "none";
+	this.showSearch( false );
+}
+
+Proutor.prototype.onResize = function()
+{
+	var height = this.getPageDimensions().h;
+	document.getElementById('browser').style.height = (height - 50) + "px";
+	document.getElementById('editor').style.height = (height - 50) + "px";
+	document.getElementById('cesure').style.height = (height - 50) + "px";
+	document.getElementById('bottombar').style.top = (height - 50) + "px";
+	document.getElementById('search').style.top = (height - 225) + "px";
+	//Tabs.Resize( height );
+	this.m_tabs.ResizeTabs();
+}
+
+Proutor.prototype.changeSyntax = function( language )
+{
+	if( this.m_tabs.m_currentEditor !== null )
+	{
+		this.m_tabs.m_currentEditor.setLanguage( language );
+	}
+}
+
+Proutor.prototype.changeEditorStyle = function(style)
+{
+	this.m_tabs.UpdateStyle( style );
+}
+
+Proutor.prototype.onUnload = function()
+{
+}
 
 

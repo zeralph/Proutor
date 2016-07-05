@@ -5,7 +5,7 @@
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 		<title>Menu</title>
-		<script src="../Parameters/parameters.js"></script>
+		<script src="../Parameters/Parameters.js"></script>
 		<script type="text/javascript">
 			function retFunc( data )
 			{

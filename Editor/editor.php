@@ -71,7 +71,7 @@
 		<script src="../CodeMirror/addon/search/search.js"></script>
 		<script src="../CodeMirror/addon/search/searchcursor.js"></script>
 		<script src="../CodeMirror/addon/search/match-highlighter.js"></script>
-		<script src="../Parameters/parameters.js"></script>
+		<script src="../Parameters/Parameters.js"></script>
 		<script src="editor.js"></script>
 	</head>
 	<body>
@@ -86,9 +86,9 @@
 				<textarea id="code" name="code"></textarea>
 			</form>
 			<script>
-					window.onload 		= onLoad;
-					window.onkeypress 	= top.Proutor.onKeyPress;
-					window.onkeydown 	= top.Proutor.onKeyPress;
+					window.onload 			= onLoad;
+					window.onkeypress 		= top.Proutor.onKeyPress;
+					window.onkeydown 		= top.Proutor.onKeyPress;
 					document.onmousedown 	= top.Resize.doDown;
 					document.onmouseup   	= top.Resize.doUp;
 					document.onmousemove 	= top.Resize.doMove;
@@ -99,11 +99,14 @@
 						var curFile = "<?php echo $file; ?>";
 						var curFileName = "<?php echo $name; ?>";
 						var bShow = <?php if($show){echo"true";}else{echo"false";} ?>;
-						var myEditor = new Editor.instance( curFile, curFileName, bShow );
+						var proutor = top.ProutorInstance;
+						console.log("EDITOR : proutor instance : "+proutor);
+						var tabs = proutor.getTabs();
+						var myEditor = new Editor( proutor, tabs, curFile, curFileName, bShow );
 						myEditor.init();
-						top.Tabs.m_editors[curFile] = myEditor;
-						top.Tabs.m_currentEditor = top.Tabs.m_editors[curFile];
-						top.Tabs.m_currentEditor.Resize();
+						tabs.m_editors[curFile] = myEditor;
+						tabs.m_currentEditor = tabs.m_editors[curFile];
+						tabs.m_currentEditor.Resize();
 					}
 			</script>
 		</div>

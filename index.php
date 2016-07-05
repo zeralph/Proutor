@@ -12,21 +12,26 @@
 		<script type="text/javascript" src="Tabs/javascript/tabs.js"></script>
 		<link rel="stylesheet" href="Tabs/css/tabs.css">
 		
-		<script src="Menu/javascript/menu.js"></script> 
-		<script src="javascript/resize.js"></script> 
+		<script src="Menu/javascript/Menu.js"></script> 
 		<script src="javascript/Proutor.js"></script> 
-		<script src="Parameters/parameters.js"></script> 
+		<script src="javascript/Resize.js"></script> 
+		<script src="Parameters/Parameters.js"></script> 
 	</head>
 	<body>
 		<script type="text/javascript">
-				window.onload 		= Proutor.onLoad;
-				window.onresize 	= Proutor.onResize;
-				window.onkeypress 	= Proutor.onKeyPress;
-				window.onkeydown 	= Proutor.onKeyPress;
-				window.onmousedown 	= Resize.doDown;
-				window.onmouseup   	= Resize.doUp;
-				window.onmousemove 	= Resize.doMove;
-				window.onbeforeunload  	= Proutor.onUnload;
+				var m_Proutor = new Proutor();
+				var m_Resize = new Resize( m_Proutor );
+				window.onload 			= function(){m_Proutor.onLoad();};
+				window.onresize 		= function(){m_Proutor.onResize();};
+				window.onkeypress 		= function(e){m_Proutor.onKeyPress(e);};
+				window.onkeydown 		= function(e){m_Proutor.onKeyPress(e);};
+				window.onmousedown 		= function(e){m_Resize.doDown(e);};
+				window.onmouseup   		= function(e){m_Resize.doUp(e);};
+				window.onmousemove 		= function(e){m_Resize.doMove(e);};
+				window.onbeforeunload  	= function(){m_Proutor.onUnload();};
+			
+				window.ProutorInstance = m_Proutor;
+			
 				//console.log( "navigator : "+navigator.userAgent.search("Firefox") );
 				//Parameters.setParameter( "style", "zob");	
 				//Parameters.getParameter( "style", onTest);

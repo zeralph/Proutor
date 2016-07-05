@@ -65,6 +65,7 @@ body
 	border-top: 1px solid #c9c3ba; 
 	margin: -1px;
 	z-index : 0;
+	overflow-y: scroll;
 }
 .editor 
 { 
